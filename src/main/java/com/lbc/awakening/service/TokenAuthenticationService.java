@@ -30,18 +30,22 @@ public class TokenAuthenticationService {
 
     @Autowired
     UserService userService;
+
     @Value("${awakening.security.expirationtime}")
     public void setEXPIRATIONTIME(long EXPIRATIONTIME) {
         TokenAuthenticationService.EXPIRATIONTIME = EXPIRATIONTIME;
     }
+
     @Value("${awakening.security.secret}")
     public void setSECRET(String SECRET) {
         TokenAuthenticationService.SECRET = SECRET;
     }
+
     @Value("${awakening.security.token_prefix}")
     public void setTokenPrefix(String tokenPrefix) {
         TOKEN_PREFIX = tokenPrefix;
     }
+
     @Value("${awakening.security.header}")
     public void setHeaderString(String headerString) {
         HEADER_STRING = headerString;
@@ -58,9 +62,9 @@ public class TokenAuthenticationService {
                 .compact();
 
         String encryptedToken = this.userModelSecurityService.encrypt(JWT);
-        res.addHeader("Access-Control-Allow-Headers",HEADER_STRING);
-        res.addHeader("Access-Control-Expose-Headers",HEADER_STRING);
-        res.addHeader(HEADER_STRING, encryptedToken );
+        res.addHeader("Access-Control-Allow-Headers", HEADER_STRING);
+        res.addHeader("Access-Control-Expose-Headers", HEADER_STRING);
+        res.addHeader(HEADER_STRING, encryptedToken);
         res.setContentType("application/json");
         PrintWriter writer = res.getWriter();
         ObjectMapper mapper = new ObjectMapper();
@@ -69,7 +73,12 @@ public class TokenAuthenticationService {
     }
 
     public Authentication getAuthentication(HttpServletRequest request) {
-        String token = this.userModelSecurityService.decryptToString(request.getHeader(HEADER_STRING));
+        String token;
+        try {
+            token = this.userModelSecurityService.decryptToString(request.getHeader(HEADER_STRING));
+        } catch (Exception ex) {
+            return null;
+        }
         System.out.println(token);
         if (token != null) {
             String emailAddress = Jwts.parser()
@@ -78,13 +87,13 @@ public class TokenAuthenticationService {
                     .getBody()
                     .getSubject();
             UserModel user = userService.getByEmail(emailAddress);
-            if("admin@lunkasu.com".equals(emailAddress)){
+            if ("admin@lunkasu.com".equals(emailAddress)) {
                 return new UsernamePasswordAuthenticationToken(emailAddress, null,
-                        Arrays.asList(new SimpleGrantedAuthority("ADMIN") ));
+                        Arrays.asList(new SimpleGrantedAuthority("ADMIN")));
             }
-            return emailAddress != null && user!=null ?
+            return emailAddress != null && user != null ?
                     new UsernamePasswordAuthenticationToken(emailAddress, null,
-                            Arrays.asList(new SimpleGrantedAuthority("USER") )) :
+                            Arrays.asList(new SimpleGrantedAuthority("USER"))) :
                     null;
         }
         return null;

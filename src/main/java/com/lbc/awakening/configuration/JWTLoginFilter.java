@@ -1,5 +1,6 @@
 package com.lbc.awakening.configuration;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lbc.awakening.model.UserModel;
 import com.lbc.awakening.service.SecurityService;
@@ -52,8 +53,13 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
 
             request+=tempString;
         }
+        UserModel credentials;
+        try {
+            credentials = securityService.decrypt(request,UserModel.class);
+        }catch (Exception ex){
+            return null;
+        }
 
-        UserModel credentials = securityService.decrypt(request,UserModel.class);
 
         Authentication authentication = null;
         try {

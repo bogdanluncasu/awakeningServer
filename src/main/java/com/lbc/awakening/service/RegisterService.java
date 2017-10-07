@@ -29,6 +29,16 @@ public class RegisterService {
         return this.passwordEncoder.encode(password);
     }
     public String register(String encrypted){
+        try {
+            return this.registerUser(encrypted);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    private String registerUser(String encrypted) throws Exception {
         UserModel userModel = securityService.decrypt(encrypted,UserModel.class);
         if(userModel.isValid()){
             userModel.setPassword(encodePassword(userModel.getPassword()));

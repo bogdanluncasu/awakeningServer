@@ -2,7 +2,6 @@ package com.lbc.awakening.configuration;
 
 import com.lbc.awakening.service.TokenAuthenticationService;
 import io.jsonwebtoken.ExpiredJwtException;
-import jdk.nashorn.internal.parser.Token;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

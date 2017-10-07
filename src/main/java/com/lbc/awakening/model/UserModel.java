@@ -4,13 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(uniqueConstraints={@UniqueConstraint(columnNames={"email"})})
-public class UserModel implements Serializable{
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
+public class UserModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
+
     @JsonIgnore
     private transient String emailRegex = "^[a-zA-Z1-9_.]+@[a-zA-Z]+\\.[a-zA-Z]{1,5}$";
 
@@ -19,11 +22,66 @@ public class UserModel implements Serializable{
 
     private String firstName;
     private String lastName;
-
+    private int gold;
+    private double gems;
+    private int userType; // normal,premium,etc
     @Column(unique = true)
     private String email;
     private String password;
 
+    @OneToMany(
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<VillageModel> villages = new ArrayList<>();
+
+    public List<VillageModel> getVillages() {
+        return villages;
+    }
+
+    public void setVillages(List<VillageModel> villages) {
+        this.villages = villages;
+    }
+
+    public String getEmailRegex() {
+        return emailRegex;
+    }
+
+    public void setEmailRegex(String emailRegex) {
+        this.emailRegex = emailRegex;
+    }
+
+    public String getNameRegex() {
+        return nameRegex;
+    }
+
+    public void setNameRegex(String nameRegex) {
+        this.nameRegex = nameRegex;
+    }
+
+    public int getGold() {
+        return gold;
+    }
+
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
+
+    public double getGems() {
+        return gems;
+    }
+
+    public void setGems(double gems) {
+        this.gems = gems;
+    }
+
+    public int getUserType() {
+        return userType;
+    }
+
+    public void setUserType(int userType) {
+        this.userType = userType;
+    }
     public String getFirstName() {
         return firstName;
     }
@@ -56,41 +114,17 @@ public class UserModel implements Serializable{
         this.password = password;
     }
 
-    public String getEmailRegex() {
-        return emailRegex;
-    }
 
-    public void setEmailRegex(String emailRegex) {
-        this.emailRegex = emailRegex;
-    }
-
-    public String getNameRegex() {
-        return nameRegex;
-    }
-
-    public void setNameRegex(String nameRegex) {
-        this.nameRegex = nameRegex;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-    private boolean isPasswordValid(){
-        return this.password!=null && this.password.matches("^.*[0-9].*$")//at least one number
+    private boolean isPasswordValid() {
+        return this.password != null && this.password.matches("^.*[0-9].*$")//at least one number
                 && this.password.matches("^.*[A-Z].*$")//at least one Capital character
                 && this.password.matches("^.{6,}$");
     }
 
-    public boolean isValid(){
+    public boolean isValid() {
 
-        if(this.getEmail().matches(emailRegex)&&this.firstName.matches(nameRegex)&&this.lastName.matches(nameRegex)
-                &&isPasswordValid()){
+        if (this.getEmail().matches(emailRegex) && this.firstName.matches(nameRegex) && this.lastName.matches(nameRegex)
+                && isPasswordValid()) {
             return true;
         }
         return false;

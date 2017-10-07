@@ -5,6 +5,8 @@ import com.lbc.awakening.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
     @Autowired
@@ -14,5 +16,9 @@ public class UserService {
 
         System.out.println(email);
         return userRepository.getUserByEmail(email);
+    }
+
+    public List<UserModel> getAllUsers(){
+        return this.userRepository.findAll();
     }
 }
